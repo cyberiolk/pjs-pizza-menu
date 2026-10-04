@@ -92,3 +92,8 @@ body{text-transform:uppercase}
 .deal p{letter-spacing:.3px}
 .size b,.head .note,.delivery,.hours dl,.also{letter-spacing:.6px}
 .ov p{text-transform:none}
+
+/* TV / kiosk hardening: never scroll, never zoom, no text boosting */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.tv,html.tv body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none}
+html.tv .stage{position:fixed}

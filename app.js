@@ -80,8 +80,20 @@ let layout;
 if (SCREENS[n]) {
   document.title = `PJ's Pizza – Screen ${n}`;
   const st = makeStage(n); document.body.appendChild(st);
-  layout = () => { const s=Math.min(innerWidth/1920, innerHeight/1080);
-    st.style.transform=`scale(${s})`; st.style.left=((innerWidth-1920*s)/2)+"px"; st.style.top=((innerHeight-1080*s)/2)+"px"; };
+  document.documentElement.classList.add("tv");
+  // ?zoom=0.95 lets you nudge the size if a TV crops the edges (overscan)
+  const Z = parseFloat(new URLSearchParams(location.search).get("zoom")) || 1;
+  layout = () => {
+    const vv = window.visualViewport;
+    const W = Math.min(innerWidth, document.documentElement.clientWidth || innerWidth, vv ? vv.width : innerWidth);
+    const H = Math.min(innerHeight, document.documentElement.clientHeight || innerHeight, vv ? vv.height : innerHeight);
+    const s = Math.min(W/1920, H/1080) * Z;
+    st.style.transform=`scale(${s})`; st.style.left=((W-1920*s)/2)+"px"; st.style.top=((H-1080*s)/2)+"px";
+    window.scrollTo(0,0);
+  };
+  if (window.visualViewport) visualViewport.addEventListener("resize", ()=>layout());
+  addEventListener("orientationchange", ()=>setTimeout(layout,300));
+  setTimeout(()=>layout(),500); setTimeout(()=>layout(),2000);
   addEventListener("click",()=>{ try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); }catch(e){} });
   let idle; const hide=()=>document.body.classList.add("hide-cursor");
   addEventListener("mousemove",()=>{ document.body.classList.remove("hide-cursor"); clearTimeout(idle); idle=setTimeout(hide,3000); });
